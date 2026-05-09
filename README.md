@@ -87,6 +87,27 @@ If your VM IP is `1.2.3.4`, you can test without buying a domain:
 --set app.host=1.2.3.4.sslip.io
 ```
 
+If another platform component already owns ports `80` and `443`, enable the optional NodePort edge gateway:
+
+```bash
+helm upgrade --install k3s-portfolio ./infra/helm/k3s-portfolio \
+  --namespace portfolio \
+  --create-namespace \
+  --set app.host=YOUR_DOMAIN_OR_VM_IP.sslip.io \
+  --set edge.enabled=true \
+  --set edge.nodePort=30080 \
+  --set backend.image.repository=k3s-portfolio-backend \
+  --set backend.image.tag=local \
+  --set frontend.image.repository=k3s-portfolio-frontend \
+  --set frontend.image.tag=local
+```
+
+Then open:
+
+```text
+http://YOUR_VM_IP:30080
+```
+
 ## Verify
 
 ```bash

@@ -1,6 +1,18 @@
 app:
   host: demo.example.com
 
+edge:
+  enabled: false
+  image: nginx:1.27-alpine
+  nodePort: 30080
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 128Mi
+
 frontend:
   image:
     repository: ghcr.io/YOUR_USER/k3s-portfolio-frontend
@@ -42,4 +54,3 @@ postgres:
     limits:
       cpu: 500m
       memory: 512Mi
-
