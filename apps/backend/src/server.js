@@ -26,6 +26,24 @@ async function ensureSchema() {
   `);
 }
 
+async function waitForDatabase() {
+  const maxAttempts = Number(process.env.DB_CONNECT_ATTEMPTS || 30);
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await ensureSchema();
+      return;
+    } catch (error) {
+      if (attempt === maxAttempts) {
+        throw error;
+      }
+
+      console.log(`database not ready, retrying (${attempt}/${maxAttempts})`);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }
+}
+
 app.get("/healthz", async (_req, res) => {
   try {
     await pool.query("select 1");
@@ -50,9 +68,8 @@ app.post("/api/visits", async (_req, res) => {
   res.status(201).json(result.rows[0]);
 });
 
-await ensureSchema();
+await waitForDatabase();
 
 app.listen(port, "0.0.0.0", () => {
   console.log(`backend listening on ${port}`);
 });
-

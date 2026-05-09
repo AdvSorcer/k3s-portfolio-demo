@@ -19,7 +19,8 @@ docker compose up --build
 
 Open:
 
-- Frontend: http://localhost:8080
+- Frontend container only: http://localhost:8080
+- Local edge proxy with `/api` routing: http://localhost:8081
 - Backend health: http://localhost:3000/healthz
 
 ## VM Requirements
