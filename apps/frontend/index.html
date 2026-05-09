@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>k3s Portfolio Demo</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel">
+        <p class="eyebrow">Kubernetes on k3s</p>
+        <h1>Production-style deployment demo</h1>
+        <p class="lead">Frontend, backend, PostgreSQL, Ingress, PVC, probes, and Helm running on a cloud VM.</p>
+        <div class="actions">
+          <button id="visitButton">Write visit</button>
+          <button id="refreshButton" class="secondary">Refresh</button>
+        </div>
+      </section>
+      <section class="status">
+        <div>
+          <span>Backend</span>
+          <strong id="service">Loading</strong>
+        </div>
+        <div>
+          <span>Database</span>
+          <strong id="database">Loading</strong>
+        </div>
+        <div>
+          <span>Visits</span>
+          <strong id="visits">0</strong>
+        </div>
+        <div>
+          <span>Timestamp</span>
+          <strong id="timestamp">-</strong>
+        </div>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
+

@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "k3s-portfolio.fullname" . }}
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: {{ .Values.app.host | quote }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "k3s-portfolio.fullname" . }}-backend
+                port:
+                  number: 3000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "k3s-portfolio.fullname" . }}-frontend
+                port:
+                  number: 80

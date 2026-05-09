@@ -1,0 +1,7 @@
+apiVersion: v2
+name: k3s-portfolio
+description: Full-stack k3s portfolio demo
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+

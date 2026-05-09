@@ -1,0 +1,45 @@
+app:
+  host: demo.example.com
+
+frontend:
+  image:
+    repository: ghcr.io/YOUR_USER/k3s-portfolio-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 128Mi
+
+backend:
+  image:
+    repository: ghcr.io/YOUR_USER/k3s-portfolio-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+postgres:
+  image: postgres:16-alpine
+  database: portfolio
+  username: portfolio
+  password: portfolio-change-me
+  storageSize: 5Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
