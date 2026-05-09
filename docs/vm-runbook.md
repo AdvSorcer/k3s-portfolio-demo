@@ -32,12 +32,22 @@ Example:
 ## 3. Install k3s And Helm
 
 ```bash
-git clone https://github.com/YOUR_USER/k3s-portfolio-demo.git
-cd k3s-portfolio-demo
-sudo bash infra/scripts/install-k3s.sh
+apt-get update
+apt-get install -y curl ca-certificates git docker.io
+curl -fsSL https://get.k3s.io | sh -
+kubectl get nodes
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+helm version
 ```
 
-## 4. Build Images
+## 4. Clone Project
+
+```bash
+git clone https://github.com/AdvSorcer/k3s-portfolio-demo.git
+cd k3s-portfolio-demo
+```
+
+## 5. Build Images
 
 The preferred production-like path is GitHub Actions + GHCR:
 
@@ -52,16 +62,33 @@ ghcr.io/YOUR_USER/k3s-portfolio-frontend:latest
 ghcr.io/YOUR_USER/k3s-portfolio-backend:latest
 ```
 
-## 5. Deploy
+For a fast VM-only demo, build and import local images:
 
 ```bash
-bash infra/scripts/deploy.sh \
-  YOUR_VM_IP.sslip.io \
-  ghcr.io/YOUR_USER/k3s-portfolio-frontend:latest \
-  ghcr.io/YOUR_USER/k3s-portfolio-backend:latest
+docker build -t k3s-portfolio-backend:local ./apps/backend
+docker build -t k3s-portfolio-frontend:local ./apps/frontend
+
+docker save k3s-portfolio-backend:local -o /tmp/k3s-portfolio-backend.tar
+docker save k3s-portfolio-frontend:local -o /tmp/k3s-portfolio-frontend.tar
+
+k3s ctr -n k8s.io images import /tmp/k3s-portfolio-backend.tar
+k3s ctr -n k8s.io images import /tmp/k3s-portfolio-frontend.tar
 ```
 
-## 6. Verify
+## 6. Deploy
+
+```bash
+helm upgrade --install k3s-portfolio ./infra/helm/k3s-portfolio \
+  --namespace portfolio \
+  --create-namespace \
+  --set app.host=YOUR_VM_IP.sslip.io \
+  --set backend.image.repository=k3s-portfolio-backend \
+  --set backend.image.tag=local \
+  --set frontend.image.repository=k3s-portfolio-frontend \
+  --set frontend.image.tag=local
+```
+
+## 7. Verify
 
 ```bash
 kubectl get pods,svc,ingress -n portfolio
@@ -70,7 +97,7 @@ kubectl logs deploy/k3s-portfolio-backend -n portfolio
 curl http://YOUR_VM_IP.sslip.io/api/status
 ```
 
-## 7. Rollback Demo
+## 8. Rollback Demo
 
 After deploying a new image tag:
 
@@ -80,10 +107,9 @@ kubectl rollout undo deploy/k3s-portfolio-backend -n portfolio
 kubectl rollout status deploy/k3s-portfolio-backend -n portfolio
 ```
 
-## 8. Cleanup
+## 9. Cleanup
 
 ```bash
 helm uninstall k3s-portfolio -n portfolio
 kubectl delete namespace portfolio
 ```
-

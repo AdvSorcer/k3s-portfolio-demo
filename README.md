@@ -29,7 +29,82 @@ Open:
 - 2 vCPU / 2 GB RAM minimum
 - 2 vCPU / 4 GB RAM recommended
 - Public IPv4
-- Ports open: `22`, `80`, `443`, `6443` restricted to your IP if possible
+- Ports open: `22`, `80`, `443`
+- Optional: `6443` restricted to your IP if you need remote `kubectl`
+
+## Clean VPS Quick Start
+
+SSH into the VM:
+
+```bash
+ssh root@YOUR_VM_IP
+```
+
+Install system tools:
+
+```bash
+apt-get update
+apt-get install -y curl ca-certificates git docker.io
+```
+
+Install k3s:
+
+```bash
+curl -fsSL https://get.k3s.io | sh -
+kubectl get nodes
+```
+
+If `kubectl get nodes` fails, use:
+
+```bash
+k3s kubectl get nodes
+```
+
+Install Helm:
+
+```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+helm version
+```
+
+Clone this project:
+
+```bash
+git clone https://github.com/AdvSorcer/k3s-portfolio-demo.git
+cd k3s-portfolio-demo
+```
+
+Build images on the VM and import them into k3s:
+
+```bash
+docker build -t k3s-portfolio-backend:local ./apps/backend
+docker build -t k3s-portfolio-frontend:local ./apps/frontend
+
+docker save k3s-portfolio-backend:local -o /tmp/k3s-portfolio-backend.tar
+docker save k3s-portfolio-frontend:local -o /tmp/k3s-portfolio-frontend.tar
+
+k3s ctr -n k8s.io images import /tmp/k3s-portfolio-backend.tar
+k3s ctr -n k8s.io images import /tmp/k3s-portfolio-frontend.tar
+```
+
+Deploy:
+
+```bash
+helm upgrade --install k3s-portfolio ./infra/helm/k3s-portfolio \
+  --namespace portfolio \
+  --create-namespace \
+  --set app.host=YOUR_VM_IP.sslip.io \
+  --set backend.image.repository=k3s-portfolio-backend \
+  --set backend.image.tag=local \
+  --set frontend.image.repository=k3s-portfolio-frontend \
+  --set frontend.image.tag=local
+```
+
+Open:
+
+```text
+http://YOUR_VM_IP.sslip.io
+```
 
 ## Install k3s On VM
 
