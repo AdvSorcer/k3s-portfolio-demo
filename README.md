@@ -106,6 +106,34 @@ Open:
 http://YOUR_VM_IP.sslip.io
 ```
 
+## GitHub Actions + GHCR
+
+This repository includes a GitHub Actions workflow at `.github/workflows/container.yml`.
+
+On every push to `main`, it builds and pushes:
+
+```text
+ghcr.io/advsorcer/k3s-portfolio-backend:<commit-sha>
+ghcr.io/advsorcer/k3s-portfolio-backend:latest
+ghcr.io/advsorcer/k3s-portfolio-frontend:<commit-sha>
+ghcr.io/advsorcer/k3s-portfolio-frontend:latest
+```
+
+After the workflow succeeds, deploy the GHCR images from the VM:
+
+```bash
+helm upgrade --install k3s-portfolio ./infra/helm/k3s-portfolio \
+  --namespace portfolio \
+  --create-namespace \
+  --set app.host=YOUR_VM_IP.sslip.io \
+  --set backend.image.repository=ghcr.io/advsorcer/k3s-portfolio-backend \
+  --set backend.image.tag=latest \
+  --set frontend.image.repository=ghcr.io/advsorcer/k3s-portfolio-frontend \
+  --set frontend.image.tag=latest
+```
+
+For a reproducible deploy, use the commit SHA tag instead of `latest`.
+
 ## Install k3s On VM
 
 SSH into the VM:
