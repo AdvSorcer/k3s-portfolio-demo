@@ -172,6 +172,8 @@ kubectl rollout status deploy/k3s-portfolio-backend -n portfolio
 
 With GitOps, the preferred rollback is to revert `values-production.yaml` to a previous commit SHA and sync again in Argo CD.
 
+For the full release and rollback procedure, see [release-runbook.md](release-runbook.md).
+
 ## 10. Cleanup
 
 ```bash

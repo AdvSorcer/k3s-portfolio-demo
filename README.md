@@ -231,6 +231,7 @@ http://YOUR_DOMAIN_OR_VM_IP.sslip.io
 ```
 
 For the full VM flow, see [docs/vm-runbook.md](docs/vm-runbook.md).
+For release and rollback operations, see [docs/release-runbook.md](docs/release-runbook.md).
 
 ## Interview Talking Points
 
