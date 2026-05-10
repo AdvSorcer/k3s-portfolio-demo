@@ -1,0 +1,44 @@
+app:
+  host: YOUR_VM_IP.sslip.io
+
+frontend:
+  image:
+    repository: ghcr.io/advsorcer/k3s-portfolio-frontend
+    tag: CHANGE_ME_COMMIT_SHA
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 128Mi
+
+backend:
+  image:
+    repository: ghcr.io/advsorcer/k3s-portfolio-backend
+    tag: CHANGE_ME_COMMIT_SHA
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+postgres:
+  image: postgres:16-alpine
+  database: portfolio
+  username: portfolio
+  password: portfolio-change-me
+  storageSize: 5Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

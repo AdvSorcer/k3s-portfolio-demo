@@ -58,8 +58,8 @@ git push origin main
 Then use:
 
 ```text
-ghcr.io/YOUR_USER/k3s-portfolio-frontend:latest
-ghcr.io/YOUR_USER/k3s-portfolio-backend:latest
+ghcr.io/YOUR_USER/k3s-portfolio-frontend:<commit-sha>
+ghcr.io/YOUR_USER/k3s-portfolio-backend:<commit-sha>
 ```
 
 For a fast VM-only demo, build and import local images:
@@ -76,6 +76,20 @@ k3s ctr -n k8s.io images import /tmp/k3s-portfolio-frontend.tar
 ```
 
 ## 6. Deploy
+
+Production-like deploy from GHCR:
+
+```bash
+helm upgrade --install k3s-portfolio ./infra/helm/k3s-portfolio \
+  --namespace portfolio \
+  --create-namespace \
+  -f infra/helm/k3s-portfolio/values-production.yaml \
+  --set app.host=YOUR_VM_IP.sslip.io \
+  --set backend.image.tag=YOUR_COMMIT_SHA \
+  --set frontend.image.tag=YOUR_COMMIT_SHA
+```
+
+Fast VM-only deploy with locally imported images:
 
 ```bash
 helm upgrade --install k3s-portfolio ./infra/helm/k3s-portfolio \

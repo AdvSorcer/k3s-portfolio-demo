@@ -119,20 +119,20 @@ ghcr.io/advsorcer/k3s-portfolio-frontend:<commit-sha>
 ghcr.io/advsorcer/k3s-portfolio-frontend:latest
 ```
 
-After the workflow succeeds, deploy the GHCR images from the VM:
+The production Helm values live at `infra/helm/k3s-portfolio/values-production.yaml`.
+Use the commit SHA tag from the successful workflow run instead of `latest`:
 
 ```bash
 helm upgrade --install k3s-portfolio ./infra/helm/k3s-portfolio \
   --namespace portfolio \
   --create-namespace \
+  -f infra/helm/k3s-portfolio/values-production.yaml \
   --set app.host=YOUR_VM_IP.sslip.io \
-  --set backend.image.repository=ghcr.io/advsorcer/k3s-portfolio-backend \
-  --set backend.image.tag=latest \
-  --set frontend.image.repository=ghcr.io/advsorcer/k3s-portfolio-frontend \
-  --set frontend.image.tag=latest
+  --set backend.image.tag=YOUR_COMMIT_SHA \
+  --set frontend.image.tag=YOUR_COMMIT_SHA
 ```
 
-For a reproducible deploy, use the commit SHA tag instead of `latest`.
+For GitOps, commit the updated SHA tags in `values-production.yaml` and let Argo CD sync that Git state into k3s.
 
 ## Install k3s On VM
 
@@ -169,7 +169,7 @@ The script installs k3s and Helm, then prepares kubeconfig for follow-up `kubect
 
 ## Deploy With Helm
 
-Build and push images first, then update `infra/helm/k3s-portfolio/values.yaml`.
+Build and push images first. For production-like deploys, update `infra/helm/k3s-portfolio/values-production.yaml` with the commit SHA image tag produced by GitHub Actions.
 
 For a quick VM-only test, build images directly on the VM and import them into containerd, or push to GHCR/Docker Hub.
 
@@ -177,11 +177,10 @@ For a quick VM-only test, build images directly on the VM and import them into c
 helm upgrade --install k3s-portfolio ./infra/helm/k3s-portfolio \
   --namespace portfolio \
   --create-namespace \
+  -f infra/helm/k3s-portfolio/values-production.yaml \
   --set app.host=YOUR_DOMAIN_OR_VM_IP.sslip.io \
-  --set backend.image.repository=ghcr.io/YOUR_USER/k3s-portfolio-backend \
-  --set backend.image.tag=latest \
-  --set frontend.image.repository=ghcr.io/YOUR_USER/k3s-portfolio-frontend \
-  --set frontend.image.tag=latest
+  --set backend.image.tag=YOUR_COMMIT_SHA \
+  --set frontend.image.tag=YOUR_COMMIT_SHA
 ```
 
 If your VM IP is `1.2.3.4`, you can test without buying a domain:
