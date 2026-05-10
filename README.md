@@ -10,6 +10,7 @@
 - Kubernetes: k3s on Ubuntu VM
 - Ingress: Traefik, bundled with k3s
 - Packaging: Helm
+- GitOps CD: Argo CD manual sync
 
 ## Local Docker Test
 
@@ -134,6 +135,32 @@ helm upgrade --install k3s-portfolio ./infra/helm/k3s-portfolio \
 
 For GitOps, commit the updated SHA tags in `values-production.yaml` and let Argo CD sync that Git state into k3s.
 
+## Argo CD GitOps Deploy
+
+Argo CD is installed in the k3s cluster under the `argocd` namespace. The application definition lives at `infra/argocd/application.yaml` and points Argo CD at the Helm chart in `infra/helm/k3s-portfolio` with `values-production.yaml`.
+
+Current deployment mode:
+
+```text
+GitHub Actions builds and pushes images automatically.
+values-production.yaml pins the deployed image tag to a commit SHA.
+Argo CD watches Git and deploys the Helm chart with manual sync.
+```
+
+Apply the Argo CD Application after Argo CD is installed:
+
+```bash
+kubectl apply -f infra/argocd/application.yaml
+```
+
+Then open Argo CD, confirm the `k3s-portfolio` application is `Healthy` and `OutOfSync`, and click `Sync`. After sync, verify:
+
+```bash
+kubectl get application k3s-portfolio -n argocd
+kubectl get pods,svc,ingress -n portfolio
+curl http://YOUR_VM_IP.sslip.io/api/status
+```
+
 ## Install k3s On VM
 
 SSH into the VM:
@@ -218,3 +245,5 @@ For the full VM flow, see [docs/vm-runbook.md](docs/vm-runbook.md).
 - Readiness probes prevent traffic before the app is ready.
 - Liveness probes restart unhealthy containers.
 - Helm values separate environment-specific configuration.
+- Argo CD provides GitOps deployment control with manual sync as a release gate.
+- Production images are pinned by commit SHA for traceable rollbacks.

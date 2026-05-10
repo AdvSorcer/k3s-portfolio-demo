@@ -111,7 +111,54 @@ kubectl logs deploy/k3s-portfolio-backend -n portfolio
 curl http://YOUR_VM_IP.sslip.io/api/status
 ```
 
-## 8. Rollback Demo
+## 8. Argo CD Manual GitOps
+
+Install Argo CD into the cluster:
+
+```bash
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl get pods -n argocd -w
+```
+
+Access the UI through an SSH tunnel instead of exposing Argo CD publicly:
+
+```bash
+ssh -L 8080:127.0.0.1:8080 root@YOUR_VM_IP
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+
+Open:
+
+```text
+https://localhost:8080
+```
+
+Get the initial admin password:
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath="{.data.password}" | base64 -d
+echo
+```
+
+Apply this repository's Argo CD Application:
+
+```bash
+kubectl apply -f infra/argocd/application.yaml
+```
+
+In Argo CD, open `k3s-portfolio` and click `Sync`. Keep the default sync options for the first manual sync.
+
+Verify:
+
+```bash
+kubectl get application k3s-portfolio -n argocd
+kubectl get pods,svc,ingress -n portfolio
+curl http://YOUR_VM_IP.sslip.io/api/status
+```
+
+## 9. Rollback Demo
 
 After deploying a new image tag:
 
@@ -121,7 +168,9 @@ kubectl rollout undo deploy/k3s-portfolio-backend -n portfolio
 kubectl rollout status deploy/k3s-portfolio-backend -n portfolio
 ```
 
-## 9. Cleanup
+With GitOps, the preferred rollback is to revert `values-production.yaml` to a previous commit SHA and sync again in Argo CD.
+
+## 10. Cleanup
 
 ```bash
 helm uninstall k3s-portfolio -n portfolio
