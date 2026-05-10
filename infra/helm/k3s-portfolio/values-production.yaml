@@ -1,5 +1,5 @@
 app:
-  host: 172.235.213.52.sslip.io
+  host: k3s.panelinker.com
 frontend:
   image:
     repository: ghcr.io/advsorcer/k3s-portfolio-frontend
