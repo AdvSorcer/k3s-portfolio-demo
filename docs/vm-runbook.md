@@ -62,6 +62,8 @@ ghcr.io/YOUR_USER/k3s-portfolio-frontend:<commit-sha>
 ghcr.io/YOUR_USER/k3s-portfolio-backend:<commit-sha>
 ```
 
+The workflow also updates `infra/helm/k3s-portfolio/values-production.yaml` with the built commit SHA after both images are pushed. Argo CD will detect the Git change and wait for a manual sync.
+
 For a fast VM-only demo, build and import local images:
 
 ```bash

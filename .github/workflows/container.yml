@@ -3,10 +3,12 @@ name: container
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - infra/helm/k3s-portfolio/values-production.yaml
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -47,3 +49,36 @@ jobs:
             ${{ steps.image.outputs.repository }}:latest
           cache-from: type=gha,scope=${{ matrix.service.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service.name }}
+
+  update-production-values:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Pin production image tags
+        run: |
+          ruby <<'RUBY'
+          require "yaml"
+
+          path = "infra/helm/k3s-portfolio/values-production.yaml"
+          values = YAML.load_file(path)
+          values.fetch("frontend").fetch("image")["tag"] = ENV.fetch("GITHUB_SHA")
+          values.fetch("backend").fetch("image")["tag"] = ENV.fetch("GITHUB_SHA")
+          File.write(path, values.to_yaml.sub(/\A---\n/, ""))
+          RUBY
+
+      - name: Commit production values update
+        run: |
+          if git diff --quiet -- infra/helm/k3s-portfolio/values-production.yaml; then
+            echo "Production image tags are already pinned to ${GITHUB_SHA}."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add infra/helm/k3s-portfolio/values-production.yaml
+          git commit -m "chore: update production image tags to ${GITHUB_SHA::7}"
+          git push origin HEAD:${GITHUB_REF_NAME}

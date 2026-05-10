@@ -143,8 +143,8 @@ Current deployment mode:
 
 ```text
 GitHub Actions builds and pushes images automatically.
-values-production.yaml pins the deployed image tag to a commit SHA.
-Argo CD watches Git and deploys the Helm chart with manual sync.
+GitHub Actions updates values-production.yaml with the built commit SHA.
+Argo CD watches Git and waits for manual sync.
 ```
 
 Apply the Argo CD Application after Argo CD is installed:
@@ -247,3 +247,4 @@ For the full VM flow, see [docs/vm-runbook.md](docs/vm-runbook.md).
 - Helm values separate environment-specific configuration.
 - Argo CD provides GitOps deployment control with manual sync as a release gate.
 - Production images are pinned by commit SHA for traceable rollbacks.
+- GitHub Actions updates the GitOps desired state after image builds succeed.
