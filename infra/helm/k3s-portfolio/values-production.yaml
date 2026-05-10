@@ -1,10 +1,9 @@
 app:
   host: 172.235.213.52.sslip.io
-
 frontend:
   image:
     repository: ghcr.io/advsorcer/k3s-portfolio-frontend
-    tag: 72b2ea2316eef3da2ccf3c0ac22696cb7cd87d4a
+    tag: c3b33e96e151655c77d99bc576279454462216cd
     pullPolicy: IfNotPresent
   replicas: 1
   resources:
@@ -14,11 +13,10 @@ frontend:
     limits:
       cpu: 250m
       memory: 128Mi
-
 backend:
   image:
     repository: ghcr.io/advsorcer/k3s-portfolio-backend
-    tag: 72b2ea2316eef3da2ccf3c0ac22696cb7cd87d4a
+    tag: c3b33e96e151655c77d99bc576279454462216cd
     pullPolicy: IfNotPresent
   replicas: 1
   resources:
@@ -28,7 +26,6 @@ backend:
     limits:
       cpu: 500m
       memory: 256Mi
-
 postgres:
   image: postgres:16-alpine
   database: portfolio
