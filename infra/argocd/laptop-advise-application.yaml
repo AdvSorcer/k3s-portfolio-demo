@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: laptop-advise
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AdvSorcer/k3s-portfolio-demo.git
+    targetRevision: main
+    path: infra/helm/laptop-advise
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: portfolio
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
