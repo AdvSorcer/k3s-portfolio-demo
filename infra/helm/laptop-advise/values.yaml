@@ -1,0 +1,55 @@
+app:
+  host: laptop.panelinker.com
+
+image:
+  repository: ghcr.io/advsorcer/laptop-advise
+  tag: d5d037594dc014dbb40f1c36ec277a2a5e028e65
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: ghcr-pull-secret
+
+replicas: 1
+
+service:
+  port: 80
+  targetPort: 8080
+
+laravel:
+  env:
+    APP_NAME: "Laptop Advise"
+    APP_ENV: production
+    APP_DEBUG: "false"
+    APP_URL: "https://laptop.panelinker.com"
+    APP_LOCALE: zh_TW
+    APP_FALLBACK_LOCALE: en
+    DB_CONNECTION: pgsql
+    DB_PORT: "5432"
+    SESSION_DRIVER: database
+    CACHE_STORE: database
+    QUEUE_CONNECTION: database
+    LOG_CHANNEL: stderr
+  secretName: laptop-advise-secret
+  appKeySecretKey: APP_KEY
+  dbPasswordSecretKey: DB_PASSWORD
+
+postgres:
+  image: postgres:16-alpine
+  database: laptop_advise
+  username: laptop_user
+  storageSize: 5Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
