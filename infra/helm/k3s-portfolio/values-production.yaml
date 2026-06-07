@@ -3,7 +3,7 @@ app:
 frontend:
   image:
     repository: ghcr.io/advsorcer/k3s-portfolio-frontend
-    tag: 38eca762ab6004ed9daef4495ff6048d0106dac6
+    tag: a5003e27d9605f9cf53452f907e4635f7d74aabe
     pullPolicy: IfNotPresent
   replicas: 1
   resources:
@@ -16,7 +16,7 @@ frontend:
 backend:
   image:
     repository: ghcr.io/advsorcer/k3s-portfolio-backend
-    tag: 38eca762ab6004ed9daef4495ff6048d0106dac6
+    tag: a5003e27d9605f9cf53452f907e4635f7d74aabe
     pullPolicy: IfNotPresent
   replicas: 1
   resources:
