@@ -53,3 +53,12 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
+
+migration:
+  enabled: false
+  command:
+    - php
+    - artisan
+    - migrate
+    - --force
+  backoffLimit: 2

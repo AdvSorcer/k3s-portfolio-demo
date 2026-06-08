@@ -1,0 +1,43 @@
+{{- if .Values.migration.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "laptop-advise.fullname" . }}-migrate
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: {{ .Values.migration.backoffLimit }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "laptop-advise.fullname" . }}-migrate
+    spec:
+      restartPolicy: Never
+{{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+{{- end }}
+      containers:
+        - name: migrate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+{{ toYaml .Values.migration.command | indent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "laptop-advise.fullname" . }}-config
+          env:
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.laravel.secretName }}
+                  key: {{ .Values.laravel.appKeySecretKey }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.laravel.secretName }}
+                  key: {{ .Values.laravel.dbPasswordSecretKey }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+{{- end }}
